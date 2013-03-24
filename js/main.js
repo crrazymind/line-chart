@@ -85,7 +85,7 @@ CurrencyChart.prototype._initialize = function(canvas, refershTime){
 		y:[]
 	};
 	this.utils.grid = {};
-	this.options.pxToSecond = this.canvas.clientWidth*this.utils.startNowPoint / this.options.secondsToShow;
+	this.options.pxToSecond = Math.floor(this.canvas.clientWidth*this.utils.startNowPoint / this.options.secondsToShow);
 	this.ctx = canvas.getContext("2d");
 	this._start();
 }
@@ -268,7 +268,6 @@ CurrencyChart.prototype._drawXaxis = function(){
 		var tickTimeDiff = this.options.secondsToShow*this.utils.startNowPoint/this.options.grid.hDensity;
 		ctx.moveTo(this.utils.grid.width * this.utils.startNowPoint - (i * this.utils.grid.xSize), this.utils.grid.height);
 		ctx.lineTo(this.utils.grid.width * this.utils.startNowPoint- (i * this.utils.grid.xSize), this.utils.grid.height - this.options.gridTickSize);
-		//var time = new Date(this.options.data.x[this.options.data.x.length - i - 1]);
 		var time = new Date(new Date().setSeconds(new Date().getSeconds() - i*tickTimeDiff));
 		ctx.translate(this.utils.grid.width * this.utils.startNowPoint - (i * this.utils.grid.xSize), this.utils.grid.height);
 		ctx.rotate(-Math.PI/2);
@@ -279,6 +278,7 @@ CurrencyChart.prototype._drawXaxis = function(){
 	ctx.restore();
 }
 CurrencyChart.prototype._prepareDataCoords = function(data){
+	// make coordinates from income data
 	this._getBounds();
 	this.utils.dataCoords = {
 		x:[],
@@ -291,7 +291,6 @@ CurrencyChart.prototype._prepareDataCoords = function(data){
 		this.utils.dataCoords.y.push(viewportHeight - (((data.y[i] - this.utils.gridMin) * (viewportHeight - yt - yb) / (this.utils.gridMax - this.utils.gridMin)) + yt));
 		//this.utils.dataCoords.y.push((data.y[i] - this.utils.gridMin)*viewportHeight / ((this.utils.gridMax - this.utils.gridMin)));
 		var secDiff = Math.floor((new Date().getTime() - new Date(data.x[i]).getTime()) / 1000);
-		this.utils.dataCoords.x.push(this.utils.startNowPoint * this.canvas.clientWidth - secDiff*this.options.pxToSecond);
+		this.utils.dataCoords.x.push(this.utils.startNowPoint * this.canvas.clientWidth - secDiff*this.options.pxToSecond - this.utils.rightGap);
 	}
-	
 }
