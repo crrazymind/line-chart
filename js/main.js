@@ -95,25 +95,18 @@ CurrencyChart.prototype._run = function(){
 	this._render(this.canvas, new Date().getTime() - (this.refershTime || 0));
 }
 CurrencyChart.prototype._refresh = function(options){
+	this.step = 0;
 	this._prepareDataCoords(options.data);
 	this._renderStatic(this.canvas, new Date().getTime() - (this.refershTime || 0));
-	//this._scrollToFit();
 	this._run();
-}
-CurrencyChart.prototype._scrollToFit = function(){
-	for (var i = 0; i < this.options.pxToSecond; i++) {
-	//for (var i = 0; i < 50; i++) {
-		this.ctx.translate(-1, 0);
-		this._renderStatic(this.canvas, new Date().getTime() - (this.refershTime || 0));
-	};
 }
 CurrencyChart.prototype._start = function(){
 	if(!this.process){
+		this.step = 0;
 		this._prepareGridlayer();
 		this._prepareDataCoords(this.options.data);
 		this._renderStatic(this.canvas, new Date().getTime() - (this.refershTime || 0));
 		this._run();
-		this.step = 0;
 	}
 }
 CurrencyChart.prototype._stop = function(){
@@ -124,18 +117,6 @@ CurrencyChart.prototype._stop = function(){
 }
 CurrencyChart.prototype._render = function(canvas, delay){
 	var ctx = this.ctx;
-	var dataDiff = this.options.data.x.length - this.utils.oldData.x.length;
-	if(dataDiff > 0) {
-		this.step = 0;
-		this.utils.oldData.x = this.options.data.x.slice(0);
-		this.utils.oldData.y = this.options.data.y.slice(0);
-	}
-	if(window.qwe1 && window.qwe1 !== undefined) {
-		//this.utils.add += 0.1;
-		ctx.translate(qwe1, dimensions.top);
-	}
-
-
 	var xc = this.utils.dataCoords.x;
 	var yc = this.utils.dataCoords.y;
 
@@ -242,6 +223,7 @@ CurrencyChart.prototype._drawGrid = function(){
 	ctx.restore();
 }
 CurrencyChart.prototype._drawYaxis = function(){
+	// draw axis
 	var ctx = this.gridLayer.get(0).getContext("2d");
 	ctx.beginPath();
 	ctx.strokeStyle = this.options.grid.xAxisColor;
@@ -260,14 +242,13 @@ CurrencyChart.prototype._drawYaxis = function(){
 	for (var i = this.options.grid.vDensity; i >= 0; i--){
 		ctx.moveTo(0, i*tickStep);
 		ctx.lineTo(this.options.gridTickSize, i*tickStep)
-		//ctx.fillText(time.getHours(), this.utils.grid.width * this.utils.startNowPoint - (i * this.utils.grid.xSize) - 5, this.utils.grid.height + 15);
 		ctx.fillText((this.utils.gridMax - val*i).toFixed(4), -40, i*tickStep + 3);
 		ctx.stroke();
 	};
 	ctx.restore();
-
 }
 CurrencyChart.prototype._drawXaxis = function(){
+	// draw axis
 	var ctx = this.gridLayer.get(0).getContext("2d");
 	ctx.beginPath();
 	ctx.strokeStyle = this.options.grid.yAxisColor;
@@ -284,12 +265,14 @@ CurrencyChart.prototype._drawXaxis = function(){
 	ctx.translate(this.utils.leftGap, this.utils.topGap);
 	for (var i = ticksBefore; i >= 0; i-=2) {
 		ctx.save();
+		var tickTimeDiff = this.options.secondsToShow*this.utils.startNowPoint/this.options.grid.hDensity;
 		ctx.moveTo(this.utils.grid.width * this.utils.startNowPoint - (i * this.utils.grid.xSize), this.utils.grid.height);
 		ctx.lineTo(this.utils.grid.width * this.utils.startNowPoint- (i * this.utils.grid.xSize), this.utils.grid.height - this.options.gridTickSize);
-		var time = new Date(this.options.data.x[this.options.data.x.length - i - 1]);
+		//var time = new Date(this.options.data.x[this.options.data.x.length - i - 1]);
+		var time = new Date(new Date().setSeconds(new Date().getSeconds() - i*tickTimeDiff));
 		ctx.translate(this.utils.grid.width * this.utils.startNowPoint - (i * this.utils.grid.xSize), this.utils.grid.height);
-		ctx.rotate(Math.PI/2);
-		ctx.fillText(time.getHours() + ":" + time.getMinutes() + ':' + (time.getSeconds() < 10 ? '0' + time.getSeconds() : time.getSeconds()), 5, 2);
+		ctx.rotate(-Math.PI/2);
+		ctx.fillText(time.getHours() + ":" + time.getMinutes() + ':' + (time.getSeconds() < 10 ? '0' + time.getSeconds() : time.getSeconds()), -45, 2);
 		ctx.stroke();
 		ctx.restore();
 	};
@@ -302,8 +285,8 @@ CurrencyChart.prototype._prepareDataCoords = function(data){
 		y:[]
 	};
 	var viewportHeight = this.canvas.clientHeight - this.utils.rightGap - this.utils.leftGap;
-	this.utils.scale =  (this.utils.gridMax - this.utils.gridMin) / (viewportHeight  - yt - yb);
 	var yt = 20, yb = 20;
+	this.utils.scale =  (this.utils.gridMax - this.utils.gridMin) / (viewportHeight  - yt - yb);	
 	for (var i = 0, m = data.x.length; i<m;  i++) {
 		this.utils.dataCoords.y.push(viewportHeight - (((data.y[i] - this.utils.gridMin) * (viewportHeight - yt - yb) / (this.utils.gridMax - this.utils.gridMin)) + yt));
 		//this.utils.dataCoords.y.push((data.y[i] - this.utils.gridMin)*viewportHeight / ((this.utils.gridMax - this.utils.gridMin)));

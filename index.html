@@ -21,10 +21,10 @@
 	<script type="text/javascript">
 		jQuery(function(){
 			var options = {
-				ololo : "",
+				secondsToShow : 300,
 				data : {
 					x: [new Date().setSeconds(new Date().getSeconds() - 353), new Date().setSeconds(new Date().getSeconds() - 53), new Date().setSeconds(new Date().getSeconds() - 3), new Date().setSeconds(new Date().getSeconds() - 2), new Date().setSeconds(new Date().getSeconds() - 1)],
-					y: [0.5, 0.75, 0.01, 0.99, 1.9]
+					y: [0.5, 0.75, 0.01, 0.99, 1]
 				}
 			}
 			var chart = new CurrencyChart(options);
@@ -36,13 +36,12 @@
 			var _i = options.data.x.length-1;
 			setInterval(function(){
 				_i++;
-				var val = Math.random()*2;
+				var val = Math.random()*0.5;
 				console.log(val);
 				options.data.y.push(val);
 
 				//options.data.x.push(_i*30);
 				options.data.x.push(new Date().getTime());
-				//console.log(options.data.x)
 				chart.refresh(options);
 				
 			},1000)
