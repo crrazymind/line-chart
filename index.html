@@ -24,7 +24,7 @@
 				ololo : "",
 				data : {
 					x: [new Date().setSeconds(new Date().getSeconds() - 353), new Date().setSeconds(new Date().getSeconds() - 53), new Date().setSeconds(new Date().getSeconds() - 3), new Date().setSeconds(new Date().getSeconds() - 2), new Date().setSeconds(new Date().getSeconds() - 1)],
-					y: [0.01, 1.5, 1, 2, 0.9]
+					y: [0.5, 0.75, 1, 0.99, 0.9]
 				}
 			}
 			var chart = new CurrencyChart(options);
@@ -36,13 +36,16 @@
 			var _i = options.data.x.length-1;
 			setInterval(function(){
 				_i++;
-				options.data.y.push(Math.random()*2);
+				var val = Math.random()*2;
+				console.log(val);
+				options.data.y.push(val);
+
 				//options.data.x.push(_i*30);
 				options.data.x.push(new Date().getTime());
 				//console.log(options.data.x)
 				chart.refresh(options);
 				
-			},3000)
+			},1000)
 		});
 	</script>
 </body>
