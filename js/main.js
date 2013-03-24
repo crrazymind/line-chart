@@ -302,10 +302,10 @@ CurrencyChart.prototype._prepareDataCoords = function(data){
 		y:[]
 	};
 	var viewportHeight = this.canvas.clientHeight - this.utils.rightGap - this.utils.leftGap;
-	this.utils.scale =  viewportHeight / (this.utils.gridMax - this.utils.gridMin);
+	this.utils.scale =  (this.utils.gridMax - this.utils.gridMin) / (viewportHeight  - yt - yb);
 	var yt = 20, yb = 20;
 	for (var i = 0, m = data.x.length; i<m;  i++) {
-		this.utils.dataCoords.y.push(((data.y[i] - this.utils.gridMin) * (viewportHeight - yt - yb) / (this.utils.gridMax - this.utils.gridMin)) + yt);
+		this.utils.dataCoords.y.push(viewportHeight - (((data.y[i] - this.utils.gridMin) * (viewportHeight - yt - yb) / (this.utils.gridMax - this.utils.gridMin)) + yt));
 		//this.utils.dataCoords.y.push((data.y[i] - this.utils.gridMin)*viewportHeight / ((this.utils.gridMax - this.utils.gridMin)));
 		var secDiff = Math.floor((new Date().getTime() - new Date(data.x[i]).getTime()) / 1000);
 		this.utils.dataCoords.x.push(this.utils.startNowPoint * this.canvas.clientWidth - secDiff*this.options.pxToSecond);
