@@ -78,7 +78,7 @@ q:after{content:''}
 }
 .choise-holder .time-choose-label{
 	float: left;
-	margin: 0 20px 0 10px;
+	margin: 4px 20px 0 10px;
 }
 .period-choose{
 	float: left;

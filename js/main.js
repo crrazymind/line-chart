@@ -17,8 +17,12 @@ jQuery(function(){
 	var el = document.getElementById('chart-element');
 	chart.start(el, 1000);
 
+	var scaleCoeff = 0.5;
 	setInterval(function(){
-		var val = Math.random()*0.5;
+		scaleCoeff = Math.random()*2;
+	},5000)
+	setInterval(function(){
+		var val = Math.random()*0.5 + scaleCoeff;
 		options.data.y.push(val);
 		options.data.x.push(new Date().getTime());
 		chart.refresh(options);
