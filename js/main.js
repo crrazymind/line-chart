@@ -49,6 +49,7 @@ CurrencyChart.prototype.RAFCompatibility = (function() {
 	cancelAnimationFrame = function(id) {
 		var cancelAnimationFrame =
 			window.cancelAnimationFrame ||
+			window.mozCancelAnimationFrame ||
 			function(id) {
 				clearTimeout(id);
 			};
@@ -94,22 +95,25 @@ CurrencyChart.prototype._refresh = function(options){
 	this.step = 0;
 	this._prepareDataCoords(options.data);
 	this.options.pxToSecond = Math.floor(this.canvas.clientWidth*this.utils.startNowPoint / options.secondsToShow);
-	this._renderStatic(this.canvas, new Date().getTime() - (this.refershTime || 0));
-	this._run();
+	this._renderStatic(this.canvas);
+	if(!this.process){
+		this._run();
+	}	
 }
 CurrencyChart.prototype._start = function(){
 	if(!this.process){
 		this.step = 0;
 		this._prepareGridlayer();
 		this._prepareDataCoords(this.options.data);
-		this._renderStatic(this.canvas, new Date().getTime() - (this.refershTime || 0));
+		this._renderStatic(this.canvas);
 		this._run();
 	}
 }
 CurrencyChart.prototype._stop = function(){
 	if(this.process){
 		this.RAFCompatibility.cancelAnimationFrame(this.process);
-		this.process = null;
+		this.process = undefined;
+		delete this.process;
 	}
 }
 CurrencyChart.prototype._render = function(canvas, delay){
@@ -123,7 +127,7 @@ CurrencyChart.prototype._render = function(canvas, delay){
 	if(this.step < xdiff){
 		this.step = this.step +  (xdiff/30);
 	}else{
-		this.RAFCompatibility.cancelAnimationFrame(this.process);
+		this._stop();
 	}
 	ctx.clearRect(xc[xc.length - 2], yc[yc.length - 2],  xc[xc.length - 1] - xc[xc.length - 2], yc[yc.length - 1] - yc[yc.length - 2]);
 	ctx.strokeStyle = this.options.line.color;
@@ -137,7 +141,7 @@ CurrencyChart.prototype._render = function(canvas, delay){
 	ctx.stroke();
 }
 
-CurrencyChart.prototype._renderStatic = function(canvas, delay){
+CurrencyChart.prototype._renderStatic = function(canvas){
 	// render previous static elements
 	var options = this.options;
 	var ctx = this.ctx;
