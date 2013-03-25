@@ -50,6 +50,7 @@ CurrencyChart.prototype.RAFCompatibility = (function() {
 		var cancelAnimationFrame =
 			window.cancelAnimationFrame ||
 			window.mozCancelAnimationFrame ||
+			window.msCancelAnimationFrame ||
 			function(id) {
 				clearTimeout(id);
 			};
@@ -146,15 +147,10 @@ CurrencyChart.prototype._renderStatic = function(canvas){
 	var options = this.options;
 	var ctx = this.ctx;
 	var dimensions = this.utils.dimensions = {top: 0, left: 0, width: canvas.clientWidth, height: canvas.clientHeight};
-	
-	ctx.beginPath();
-	ctx.rect(0, 0, dimensions.width, dimensions.height);
-	ctx.clip();
-
 	ctx.fillStyle = options.grid.background;
 	ctx.clearRect(0, 0, dimensions.width, dimensions.height);
-	ctx.fillRect(0, 0, dimensions.width, dimensions.height);
 
+	//drawing grids ans axis
 	this._drawGrid();
 	this._drawXaxis();
 	this.utils.grid.ctx.clearRect(0, 0, this.utils.leftGap, dimensions.height);
@@ -172,8 +168,6 @@ CurrencyChart.prototype._renderStatic = function(canvas){
 	ctx.stroke();
 	ctx.clearRect(0, 0, this.utils.leftGap, dimensions.height);
 	ctx.beginPath();
-	ctx.rect(50,10, dimensions.width, dimensions.height);
-	ctx.clip();
 }
 CurrencyChart.prototype._getBounds = function(){
 	this.utils.gridMin = Math.min.apply( this, this.options.data.y );
