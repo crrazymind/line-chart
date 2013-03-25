@@ -6,6 +6,7 @@
 	<title>currency chart</title>
 	<link media="all" rel="stylesheet" href="css/styles.css">
 	<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+	<script type="text/javascript" src="js/currency.chart.js"></script>
 	<script type="text/javascript" src="js/main.js"></script>
 </head>
 <body>
@@ -23,46 +24,10 @@
 				<option value="60">1 minute</option>
 				<option selected="selected" value="300">5 minutes</option>
 				<option value="600">10 minutes</option>
+				<option value="1200">20 minutes</option>
 				<option value="1800">30 minutes</option>
-				<option value="3600">60 minutes</option>
 			</select>
 		</div>
 	</section>
-	<script type="text/javascript">
-		jQuery(function(){
-			var options = {
-				secondsToShow : 350,
-				data : {
-					x: [new Date().setSeconds(new Date().getSeconds() - 553), new Date().setSeconds(new Date().getSeconds() - 53), new Date().setSeconds(new Date().getSeconds() - 3), new Date().setSeconds(new Date().getSeconds() - 2), new Date().setSeconds(new Date().getSeconds() - 1)],
-					y: [0.5, 0.75, 0.01, 0.99, 1]
-				}
-			}
-			var chart = new CurrencyChart(options);
-			var el = document.getElementById('chart-element');
-			//$(el).hide();
-			//$(el).fadeIn(2000);
-			chart.start(el, 1000);
-			console.log(chart);
-			var _i = options.data.x.length-1;
-			setInterval(function(){
-				_i++;
-				var val = Math.random()*0.5;
-				//console.log(val);
-				options.data.y.push(val);
-
-				//options.data.x.push(_i*30);
-				options.data.x.push(new Date().getTime());
-				chart.refresh(options);
-				
-			},1000);
-
-
-			var sel = $(".period-choose");
-			sel.on('change', function(){
-				options.secondsToShow = $(this).val();
-				chart.refresh(options);
-			});
-		});
-	</script>
 </body>
 </html>
