@@ -47,6 +47,9 @@ q:after{content:''}
 	position: relative;
 	overflow: hidden;
 	background: #FFF;
+	padding: 5px 5px 20px;
+	border-radius: 3px;  
+	box-shadow:  5px 5px 5px 1px rgba(0, 0, 0, 0.5);
 }
 .chart-wrapper{
 	width: 100%;
@@ -67,4 +70,16 @@ q:after{content:''}
 	z-index: 1;
 	overflow: hidden;
 	zoom:1;
+}
+.choise-holder{
+	width:100%;
+	overflow: hidden;
+	margin: 20px 0 0;
+}
+.choise-holder .time-choose-label{
+	float: left;
+	margin: 0 20px 0 10px;
+}
+.period-choose{
+	float: left;
 }

@@ -10,10 +10,10 @@ function CurrencyChart(options){
 	options.grid.xAxisColor = options.grid.xAxisColor || "#000000";
 	options.grid.yAxisColor = options.grid.yAxisColor || "#000000";
 	options.line.color = options.line.color || "rgba(26, 84, 136, 1)";
-	options.secondsToShow = options.secondsToShow || 300;
+	options.secondsToShow = options.secondsToShow || 30;
 	options.gridTickSize = options.gridTickSize || 10;
 	options.grid.vDensity = 10;
-	options.grid.hDensity = 40;
+	options.grid.hDensity = 30;
 	this.options = options;
 
 	this.start = function(canvas, refershTime){
@@ -70,16 +70,12 @@ CurrencyChart.prototype._initialize = function(canvas, refershTime){
 	this.utils.lastY = 0;
 	this.utils.gridMin = 0;
 	this.utils.gridMax = 0;
-	this.utils.startNowPoint = 0.95;
+	this.utils.startNowPoint = 0.98;
 	this.utils.topGap = 10;
 	this.utils.leftGap = 50;
 	this.utils.rightGap = 10;
 	this.utils.bottomGap = 50;
 	this.utils.scale = 1;
-	this.utils.oldData = {
-		x:[],
-		y:[]
-	};
 	this.utils.dataCoords = {
 		x:[],
 		y:[]
@@ -97,6 +93,7 @@ CurrencyChart.prototype._run = function(){
 CurrencyChart.prototype._refresh = function(options){
 	this.step = 0;
 	this._prepareDataCoords(options.data);
+	this.options.pxToSecond = Math.floor(this.canvas.clientWidth*this.utils.startNowPoint / options.secondsToShow);
 	this._renderStatic(this.canvas, new Date().getTime() - (this.refershTime || 0));
 	this._run();
 }
@@ -156,6 +153,7 @@ CurrencyChart.prototype._renderStatic = function(canvas, delay){
 
 	this._drawGrid();
 	this._drawXaxis();
+	this.utils.grid.ctx.clearRect(0, 0, this.utils.leftGap, dimensions.height);
 	this._drawYaxis();
 
 	var xc = this.utils.dataCoords.x;
@@ -168,7 +166,7 @@ CurrencyChart.prototype._renderStatic = function(canvas, delay){
 		ctx.lineTo(xc[i], yc[i]);
 	};
 	ctx.stroke();
-
+	ctx.clearRect(0, 0, this.utils.leftGap, dimensions.height);
 	ctx.beginPath();
 	ctx.rect(50,10, dimensions.width, dimensions.height);
 	ctx.clip();
@@ -184,11 +182,8 @@ CurrencyChart.prototype._prepareGridlayer = function(){
 	$(this.canvas).parent().append(this.gridLayer);
 }
 CurrencyChart.prototype._drawGrid = function(){
-	var ctx = this.gridLayer.get(0).getContext("2d");
-	ctx.lineWidth = 0.5;
-	var vStep = this.options.grid.hDensity;
-	var hStep = this.options.grid.vDensity;
-	
+	var ctx = this.utils.grid.ctx = this.gridLayer.get(0).getContext("2d");
+	ctx.lineWidth = 0.5;	
 	this.utils.grid.width = this.utils.dimensions.width - this.utils.rightGap - this.utils.leftGap;
 	this.utils.grid.height = this.utils.dimensions.height - this.utils.bottomGap - this.utils.topGap;
 	ctx.clearRect(0,0, this.gridLayer.get(0).clientWidth, this.gridLayer.get(0).clientWidth);
@@ -197,24 +192,24 @@ CurrencyChart.prototype._drawGrid = function(){
 	ctx.strokeStyle = this.options.grid.vColor;
 	ctx.save();
 	ctx.translate(this.utils.leftGap, this.utils.topGap);
-	var linestep = (this.utils.grid.width)/vStep;
+	var linestep = (this.utils.grid.width)/this.options.grid.hDensity;
 	this.utils.grid.xSize = linestep;
 	
-	for (var i = 0; i < vStep; i++) {
+	for (var i = this.utils.dataCoords.x.length - 1; i >= 0; i--) {
 		ctx.beginPath();
-		ctx.moveTo(linestep * i, 0);
-		ctx.lineTo(linestep * i, this.utils.grid.height);
+		ctx.moveTo(this.utils.dataCoords.x[this.utils.dataCoords.x.length - 1] - this.utils.leftGap - linestep * i, this.utils.grid.height);
+		ctx.lineTo(this.utils.dataCoords.x[this.utils.dataCoords.x.length - 1] - this.utils.leftGap - linestep * i, 0);
 		ctx.stroke();
 	};
 	ctx.restore();
 
 	//draw horizontal grid lines
 	ctx.strokeStyle = this.options.grid.hColor;	
-	linestep = this.utils.grid.height/hStep;
+	linestep = this.utils.grid.height/this.options.grid.vDensity;
 	this.utils.grid.ySize = linestep;
 	ctx.save();
 	ctx.translate(this.utils.leftGap, this.utils.topGap);
-	for (var i = 0; i < hStep; i++) {
+	for (var i = 0; i < this.options.grid.vDensity; i++) {
 		ctx.beginPath();
 		ctx.moveTo(0, linestep * i);
 		ctx.lineTo(this.utils.grid.width, linestep * i);
@@ -260,16 +255,20 @@ CurrencyChart.prototype._drawXaxis = function(){
 	ctx.stroke();
 
 	// draw axis ticks
-	var ticksBefore = Math.ceil(this.options.grid.hDensity * this.utils.startNowPoint);
+
 	ctx.save();
+	var tickTimeDiff = this.options.secondsToShow*this.utils.startNowPoint/this.options.grid.hDensity;
 	ctx.translate(this.utils.leftGap, this.utils.topGap);
-	for (var i = ticksBefore; i >= 0; i-=2) {
+	var linestep = (this.utils.grid.width)/this.options.grid.hDensity;
+	this.utils.grid.xSize = linestep;
+	
+	for (var i = this.utils.dataCoords.x.length - 1; i >= 0; i--) {
 		ctx.save();
-		var tickTimeDiff = this.options.secondsToShow*this.utils.startNowPoint/this.options.grid.hDensity;
-		ctx.moveTo(this.utils.grid.width * this.utils.startNowPoint - (i * this.utils.grid.xSize), this.utils.grid.height);
-		ctx.lineTo(this.utils.grid.width * this.utils.startNowPoint- (i * this.utils.grid.xSize), this.utils.grid.height - this.options.gridTickSize);
+		ctx.beginPath();
+		ctx.moveTo(this.utils.dataCoords.x[this.utils.dataCoords.x.length - 1] - this.utils.leftGap - linestep * i, this.utils.grid.height);
+		ctx.lineTo(this.utils.dataCoords.x[this.utils.dataCoords.x.length - 1] - this.utils.leftGap - linestep * i, this.utils.grid.height - this.options.gridTickSize);
 		var time = new Date(new Date().setSeconds(new Date().getSeconds() - i*tickTimeDiff));
-		ctx.translate(this.utils.grid.width * this.utils.startNowPoint - (i * this.utils.grid.xSize), this.utils.grid.height);
+		ctx.translate(this.utils.dataCoords.x[this.utils.dataCoords.x.length - 1] - this.utils.leftGap - linestep * i, this.utils.grid.height);
 		ctx.rotate(-Math.PI/2);
 		ctx.fillText(time.getHours() + ":" + time.getMinutes() + ':' + (time.getSeconds() < 10 ? '0' + time.getSeconds() : time.getSeconds()), -45, 2);
 		ctx.stroke();
@@ -289,7 +288,6 @@ CurrencyChart.prototype._prepareDataCoords = function(data){
 	this.utils.scale =  (this.utils.gridMax - this.utils.gridMin) / (viewportHeight  - yt - yb);	
 	for (var i = 0, m = data.x.length; i<m;  i++) {
 		this.utils.dataCoords.y.push(viewportHeight - (((data.y[i] - this.utils.gridMin) * (viewportHeight - yt - yb) / (this.utils.gridMax - this.utils.gridMin)) + yt));
-		//this.utils.dataCoords.y.push((data.y[i] - this.utils.gridMin)*viewportHeight / ((this.utils.gridMax - this.utils.gridMin)));
 		var secDiff = Math.floor((new Date().getTime() - new Date(data.x[i]).getTime()) / 1000);
 		this.utils.dataCoords.x.push(this.utils.startNowPoint * this.canvas.clientWidth - secDiff*this.options.pxToSecond - this.utils.rightGap);
 	}
