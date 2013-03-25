@@ -135,7 +135,7 @@ CurrencyChart.prototype._render = function(canvas, delay){
 	ctx.beginPath();
 
 	ctx.moveTo(xc[xc.length - 2], yc[yc.length - 2]);
-	ctx.lineCap = 'round';
+	ctx.lineCap = "round";
 	ctx.lineTo(xc[xc.length - 2] + this.step, yc[yc.length - 2] + this.step*k);
 	ctx.closePath();
 	ctx.stroke();
@@ -274,7 +274,7 @@ CurrencyChart.prototype._drawXaxis = function(){
 		var time = new Date(new Date().setSeconds(new Date().getSeconds() - i*tickTimeDiff));
 		ctx.translate(this.utils.dataCoords.x[this.utils.dataCoords.x.length - 1] - this.utils.leftGap - linestep * i, this.utils.grid.height);
 		ctx.rotate(-Math.PI/2);
-		ctx.fillText(time.getHours() + ":" + time.getMinutes() + ':' + (time.getSeconds() < 10 ? '0' + time.getSeconds() : time.getSeconds()), -45, 2);
+		ctx.fillText(time.getHours() + ":" + time.getMinutes() + ":" + (time.getSeconds() < 10 ? "0" + time.getSeconds() : time.getSeconds()), -45, 2);
 		ctx.stroke();
 		ctx.restore();
 	};
